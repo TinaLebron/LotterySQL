@@ -48,6 +48,7 @@ public class TestArrayList {
 		AList.add("45");
 		AList.add("33");
 		AList.add("28");
+		AList.add("28");
 		String rest = "";
 		String SpecialNumber = AList.get(0);//存取第一位號碼
 		AList.remove(0);
@@ -72,8 +73,6 @@ public class TestArrayList {
 			}
 		}
 		System.out.println(rest);
-		
-		
 		
 		
 		

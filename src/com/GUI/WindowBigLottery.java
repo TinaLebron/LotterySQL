@@ -9,6 +9,7 @@ import javax.swing.JButton;
 import java.awt.BorderLayout;
 import java.awt.event.ActionListener;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -24,7 +25,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import javax.swing.SwingConstants;
 
-import com.lottery.big.BigLottery2;
+import db.DBHelper;
 
 import javax.swing.JPanel;
 import java.awt.FlowLayout;
@@ -37,39 +38,43 @@ import java.awt.ComponentOrientation;
 import java.awt.Insets;
 
 public class WindowBigLottery {
-private JFrame frame;
-	
+    private JFrame frame;
 	private JLabel label_2;
 	private JLabel lblNewLabel;
 	private JLabel lblUserName;
+	public void setUserName(String name) {
+		lblUserName.setText(name);
+	}
+	
 	private JLabel lblPickNumber;
 	
 	private JButton btnPreviousNumber;
 	private JLabel lblBigLottery;
 	private JLabel lblDate;
 
-
-	/**
-	 * Launch the  application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					WindowBigLottery window = new WindowBigLottery();
-					window.frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
-
+	private int windowHeight;
+	private int windowWidth;
+	private boolean isShowUI = true;
+	
+	
 	/**
 	 * Create the application.
+	 * 有關於初始化的東西，寫在建構子裡面。
+	 *
 	 */
-	public WindowBigLottery() {
+	public WindowBigLottery(int windowWidth,int windowHeight) {
+		this.windowHeight = windowHeight;
+		this.windowWidth = windowWidth;
 		initialize();
+		
+	}
+	
+	public void start() {
+		frame.setVisible(isShowUI);
+	}
+	
+	public void connectDB(DBHelper db) {
+		db.connectToSQL();
 	}
 	
 	/**
@@ -184,12 +189,12 @@ private JFrame frame;
 	 */
 	private void initialize() {
 		
-		connectToSQL();
+		//connectToSQL();
 		
 		frame = new JFrame();
 		frame.setMinimumSize(new Dimension(800, 400));
 		frame.setMaximumSize(new Dimension(800, 400));
-		frame.setBounds(300, 300, 450, 300);
+		frame.setBounds(600, 300, windowWidth, windowHeight);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		JPanel panel = new JPanel();
 		frame.getContentPane().add(panel, BorderLayout.NORTH);
@@ -204,6 +209,11 @@ private JFrame frame;
 		lblWelcome.setFont(new Font("新細明體", Font.PLAIN, 38));
 		lblUserName = new JLabel("New label");
 		lblUserName.setFont(new Font("新細明體", Font.PLAIN, 42));
+		lblUserName.setForeground(Color.BLACK); //字體顏色
+		lblUserName.setBackground(Color.ORANGE); //背景顏色
+		lblUserName.setOpaque(true); //透明，讓背景色可以顯示出來
+		
+	
 		
 		JLabel lblPreviousNumber = new JLabel("\u60A8\u4E0A\u671F\u6240\u9078\u7684\u865F\u78BC\u70BA:");
 		lblPreviousNumber.setFont(new Font("新細明體", Font.PLAIN, 38));
@@ -252,7 +262,7 @@ private JFrame frame;
 	
 	//BigLottery 
 	private String conUrl = "jdbc:sqlserver://localhost;"
-			+ "databaseName = LotteryDB2;"
+			+ "databaseName = LotteryDB;"
 			+"user = JJ;"
 			+"password = 12345;";
 	private Connection con = null;
@@ -271,8 +281,15 @@ private JFrame frame;
 		}
 		try {
 			con = DriverManager.getConnection(conUrl);
-			//DatabaseMetaData metadata = con.getMetaData();
-			//System.out.println(metadata.getDatabaseProductName());//獲取數據庫
+			DatabaseMetaData metadata = con.getMetaData();
+			System.out.println("Database Product Name : " + metadata.getDatabaseProductName());//獲取數據庫
+			if(!con.isClosed()) 
+				System.out.println("connect successed!");
+			else
+				System.out.println("connect failed");
+				
+		
+			
 		}
 		catch(SQLException e) {
 			System.out.println("Exception: " + e.toString());
@@ -347,8 +364,11 @@ private JFrame frame;
 		Date dNow = new Date();
 		//SimpleDateFormat formatter = new SimpleDateFormat("E yyyy.MM.dd 'at' hh:mm:ss a zzz");
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy.MM.dd");
-		System.out.println(formatter.format(dNow));
+		//System.out.println(formatter.format(dNow));
 		return formatter.format(dNow).toString();
 	}
-
+	
+	public JFrame getFrame() {
+    	return frame;
+    }
 }
